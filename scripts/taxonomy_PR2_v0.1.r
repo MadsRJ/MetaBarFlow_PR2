@@ -60,7 +60,7 @@ set.seed(100)
 
 # Assign taxonomy using the RDP classifier incorporated in DADA2's "assignTaxonomy"
 taxa <- assignTaxonomy(seqs, 
-                       refFasta = "/cluster/projects/nn10069k/blastdb/pr2/pr2_version_5.0.0_SSU_dada2.fasta.gz", 
+                       refFasta = "/cluster/projects/nn10069k/blastdb/pr2/pr2_version_5.0.0_SSU_dada2.fasta.gz", # wget https://github.com/pr2database/pr2database/releases/download/v5.0.0/pr2_version_5.0.0_SSU_dada2.fasta.gz
                        minBoot = 80,
                        multithread = 1, 
                        tryRC = T, 
