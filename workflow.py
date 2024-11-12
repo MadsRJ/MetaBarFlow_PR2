@@ -3,15 +3,15 @@ import os, sys
 import math
 from glob import glob
 
-project_name = "your_project_name"
+project_name = "YOUR_PROJECT_NAME"
 
-gwf = Workflow(defaults={"account": "edna"}) 
+gwf = Workflow(defaults={"account": "YOUR_ACCOUNT"}) 
 
 #Demultiplex
 
 batchfile = "batchfileDADA2.list"
 
-libraries = [x for x in glob("your_raw_data_path/*") if os.path.isdir(x)]
+libraries = [x for x in glob("YOUR_RAW_DATA_PATH/*") if os.path.isdir(x)]
 
 for library_root in libraries:
     library_id = os.path.basename(library_root)
@@ -20,7 +20,7 @@ for library_root in libraries:
     with open(os.path.join(library_root, "tags.txt")) as tags_file:
         for line in tags_file:
             output_files = []
-            tag_id, fseq, rseq = line.split("\t")
+            tag_id, fseq, rseq = line.split()
             
             output_files.append("tmp/{}/DADA2_AS/{}_R1.fastq".format(library_id, tag_id))
             output_files.append("tmp/{}/DADA2_AS/{}_R2.fastq".format(library_id, tag_id))
@@ -32,8 +32,8 @@ for library_root in libraries:
                 inputs=input_files,
                 outputs=output_files,
                 cores=1,
-                memory="4g",
-                walltime="5:00:00",
+                memory="2g",
+                walltime="2:00:00",
             ) << """
                 mkdir -p tmp/{library_id}
                 ./scripts/demultiplex.sh {library_root} tmp/{library_id} {tag_id} {tag_fseq} {tag_rseq} {batchfile}
@@ -46,16 +46,16 @@ for library_root in libraries:
     with open(os.path.join(library_root, "tags.txt")) as tags_file:
         for line in tags_file:
             input_files = []
-            tag_id, fseq, rseq = line.split("\t")
-            
+            tag_id, fseq, rseq = line.split()
+                        
             input_files.append("tmp/{}/DADA2_AS/{}_R1.fastq".format(library_id, tag_id))
             input_files.append("tmp/{}/DADA2_AS/{}_R2.fastq".format(library_id, tag_id))
             input_files.append("tmp/{}/DADA2_SS/{}_R1.fastq".format(library_id, tag_id))
             input_files.append("tmp/{}/DADA2_SS/{}_R2.fastq".format(library_id, tag_id))
     
             output_files = []
-            tag_id, fseq, rseq = line.split("\t")
-            
+            tag_id, fseq, rseq = line.split()
+                    
             output_files.append("tmp/{}/DADA2_AS/filtered/{}_F_filtered.fastq".format(library_id, tag_id))
             output_files.append("tmp/{}/DADA2_AS/filtered/{}_R_filtered.fastq".format(library_id, tag_id))
             output_files.append("tmp/{}/DADA2_SS/filtered/{}_F_filtered.fastq".format(library_id, tag_id))
@@ -69,7 +69,7 @@ for library_root in libraries:
                 inputs=input_files,
                 outputs=output_files,
                 cores=1,
-                memory="4g",
+                memory="2g",
                 walltime="1:00:00",
             ) << """
                 mkdir -p {folderAS}
@@ -87,16 +87,16 @@ for library_root in libraries:
     with open(os.path.join(library_root, "tags.txt")) as tags_file:
         for line in tags_file:
             input_files = []
-            tag_id, fseq, rseq = line.split("\t")
-            
+            tag_id, fseq, rseq = line.split()
+                
             input_files.append("tmp/{}/DADA2_AS/filtered/{}_F_filtered.fastq".format(library_id, tag_id))
             input_files.append("tmp/{}/DADA2_AS/filtered/{}_R_filtered.fastq".format(library_id, tag_id))
             input_files.append("tmp/{}/DADA2_SS/filtered/{}_F_filtered.fastq".format(library_id, tag_id))
             input_files.append("tmp/{}/DADA2_SS/filtered/{}_R_filtered.fastq".format(library_id, tag_id))
     
             output_files = []
-            tag_id, fseq, rseq = line.split("\t")
-            
+            tag_id, fseq, rseq = line.split()
+                        
             output_files.append("tmp/{}/DADA2_AS/filtered/matched/{}_F_matched.fastq.gz".format(library_id, tag_id))
             output_files.append("tmp/{}/DADA2_AS/filtered/matched/{}_R_matched.fastq.gz".format(library_id, tag_id))
             output_files.append("tmp/{}/DADA2_SS/filtered/matched/{}_F_matched.fastq.gz".format(library_id, tag_id))
@@ -110,7 +110,7 @@ for library_root in libraries:
                 inputs=input_files,
                 outputs=output_files,
                 cores=1,
-                memory="4g",
+                memory="2g",
                 walltime="1:00:00",
             ) << """
                 mkdir -p {folderAS}
@@ -155,8 +155,8 @@ for library_root in libraries:
     input_files = []
     with open(os.path.join(library_root, "tags.txt")) as tags_file:
         for line in tags_file:
-            tag_id, fseq, rseq = line.split("\t")
-            
+            tag_id, fseq, rseq = line.split()
+                                  
             input_files.append("tmp/{}/DADA2_AS/filtered/matched/{}_F_matched.fastq.gz".format(library_id, tag_id))
             input_files.append("tmp/{}/DADA2_AS/filtered/matched/{}_R_matched.fastq.gz".format(library_id, tag_id))
             input_files.append("tmp/{}/DADA2_SS/filtered/matched/{}_F_matched.fastq.gz".format(library_id, tag_id))
@@ -174,8 +174,8 @@ for library_root in libraries:
       inputs=input_files,
       outputs=output_files,
       cores=4,
-      memory="12g",
-      walltime="1:00:00",
+      memory="16g",
+      walltime="3:00:00",
     ) << """
       Rscript ./scripts/remove_errors.r tmp/{library_id}
       """.format(library_id=library_id)         
@@ -227,13 +227,11 @@ gwf.target(
    inputs=input_files,
    outputs=output_files,
    cores=1,
-   memory="16g",
+   memory="2g",
    walltime="1:00:00",
  ) << """
    Rscript ./scripts/sum_libraries.r tmp/ results/
    """.format()                
-
-#BLAST search and taxonomic assignment
 
 ###Split fasta file (the nochim one with chimeras removed) into K parts
 def splitter(inputFile, K=99):
@@ -250,91 +248,40 @@ def splitter(inputFile, K=99):
     '''.format(inputFile=inputFile, K=K)
     return inputs, outputs, options, spec
 
-#####blast a single k-th file
-def blaster(k, outFolder):
-    inputFasta = 'tmp/split/DADA2_nochim.part_'+'{:0>3d}'.format(k)+'.fasta'
-    inputs = [inputFasta]
-    outBlast = outFolder + '/blast.' + str(k) + '.blasthits'
-    outLog = outFolder + '/blast.' + str(k) + '.txt'
-    outputs = [
-      outBlast,
-      outLog
-    ]
-    options = {
-        'cores': 2,
-        'memory': '32g',
-        'walltime': '4:00:00'
-    }
-    spec = '''
-    export BLASTDB="your_database_path"
-    mkdir -p {out}
-    echo "RUNNING THREAD {k} BLAST"
-    blastn -db "your_database_path/file_prefix" -max_target_seqs 500 -num_threads 4 -outfmt "6 std qlen qcovs staxid" -out {outBlast} -qcov_hsp_perc 90 -perc_identity 80 -query {inputFasta}
-    echo "hello" > {outLog}
-    echo "DONE THREAD {k}"
-    '''.format(out=outFolder, k=k, inputFasta=inputFasta, outBlast=outBlast, outLog=outLog)
-    return inputs, outputs, options, spec
-
-def taxonomy(taxonomyFolder, blastFolder, k):
-    inputFile = blastFolder + '/blast.' + str(k) + '.blasthits'
-    inputs = [inputFile , blastFolder + '/blast.' + str(k) + '.txt']
-    summaryFile = taxonomyFolder + '/summary.' + str(k) + '.txt'
-    outputFile = taxonomyFolder + '/taxonomy.' + str(k) + '.txt'
-    outputs = [summaryFile, outputFile]
-    options = {
-        'cores': 1,
-        'memory': '32g',
-        'walltime': '4:00:00'
-    }
-    
-    spec = '''
-    mkdir -p {taxonomyFolder}
-    # Check if blast file is empty
-    if [ `cat {inputFile} | wc -l` != 0 ]
-    then
-      Rscript scripts/taxonomy.r {inputFile} {summaryFile} {outputFile}
-    else
-      touch {outputFile}
-      touch {summaryFile}
-    fi
-       '''.format(taxonomyFolder=taxonomyFolder, inputFile=inputFile, summaryFile=summaryFile, outputFile=outputFile) 
-    return inputs, outputs, options, spec
-
 inputName = 'results/DADA2_nochim.otus'
 
 gwf.target_from_template( 'split', splitter(inputFile=inputName) )
 
-parts=glob('tmp/split/DADA2_nochim.part*.fasta')
-K=len(parts)
-                                                                
+parts = glob('tmp/split/DADA2_nochim.part*.fasta')
+K = len(parts)
+
+# Assigning taxonomy using PR2 as learning reference database and the Naive Bayesian Classifier used in DADA2's assignTaxonomy()
+def PR2taxonomy(k, outFolder):
+    inputFasta = 'tmp/split/DADA2_nochim.part_'+'{:0>3d}'.format(k)+'.fasta'
+    inputs = [inputFasta]
+    outPR2 = outFolder + '/PR2.' + str(k) + '.txt'
+    outputs = [
+      outPR2
+    ]
+    options = {
+        'cores': 1,
+        'memory': '24g',
+        'walltime': '4:00:00'
+    }
+    spec = '''
+    mkdir -p {out}
+    echo "RUNNING THREAD {k} PR2"
+    Rscript ./scripts/taxonomy_PR2_v0.1.r {inputFasta} {outPR2}
+    echo "DONE THREAD {k}"
+    '''.format(out=outFolder, k=k, inputFasta=inputFasta, outPR2=outPR2)
+    return inputs, outputs, options, spec
+
 for k in range(1,K+1):
-  gwf.target_from_template( 'blaster_{}'.format(k), blaster(k=k, outFolder='tmp/blast') )
-  gwf.target_from_template( 'taxonomy_{}'.format(k), taxonomy(taxonomyFolder='tmp/taxonomy', blastFolder='tmp/blast', k=k) )
-
-### Combine all the small taxonomical summary files into one large file
-
-input_files = glob('tmp/taxonomy/summary*.txt')
- 
-output_files = ['results/summary.txt']
-    
-gwf.target(
-   name="combine_summary_{}".format(project_name),
-   inputs=input_files,
-   outputs=output_files,
-   cores=1,
-   memory="1g",
-   walltime="00:10:00",
- ) << """
-    head -n1 tmp/taxonomy/summary.1.txt > results/summary.txt
-    for fname in tmp/taxonomy/summary*.txt
-    do
-        tail -n +2 $fname >> results/summary.txt
-    done
-   """    
-      
+  gwf.target_from_template( 'PR2taxonomy_{}'.format(k), PR2taxonomy(k=k, outFolder='tmp/taxonomy') )
+  
 ### Combine all the small taxonomical classfication files into one large file
 
-input_files = glob('tmp/taxonomy/taxonomy*.txt')
+input_files = glob('tmp/taxonomy/PR2*.txt')
  
 output_files = ['results/classified.txt']
     
@@ -346,9 +293,11 @@ gwf.target(
    memory="1g",
    walltime="00:10:00",
  ) << """
-    head -n1 tmp/taxonomy/taxonomy.1.txt > results/classified.txt
-    for fname in tmp/taxonomy/taxonomy*.txt
+    head -n1 tmp/taxonomy/PR2.1.txt > results/classified_tmp.txt
+    for fname in tmp/taxonomy/PR2*.txt
     do
-        tail -n +2 $fname >> results/classified.txt
+        tail -n +2 $fname >> results/classified_tmp.txt
     done
-   """                
+    cat results/classified_tmp.txt | sort -t q -k 2 -n > results/classified.txt
+    rm results/classified_tmp.txt
+   """
