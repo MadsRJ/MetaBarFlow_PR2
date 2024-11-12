@@ -45,17 +45,14 @@ read_fasta <- function(file_path) {
 # https://benjjneb.github.io/dada2/assign.html
 
 # Load sequences
-#sequences_fasta <- read.delim(file = args[1], header = F)
 sequences_fasta <- read_fasta(file = args[1])
 
 # Split sequences and sequence names, remove ">" from sequence name
-#seqs <- c(sequences_fasta[seq(2,length(sequences_fasta$V1),2),])
-#seq_names <- c(sequences_fasta[seq(1,length(sequences_fasta$V1),2),])
 seqs <- sequences_fasta$sequences
 seq_names <- sequences_fasta$headers
 seq_names <- gsub(">", "", seq_names)
 
-# Initialize random number generator for reproducibility
+# Set seed for reproducibility
 set.seed(100)
 
 # Assign taxonomy using the RDP classifier incorporated in DADA2's "assignTaxonomy"
