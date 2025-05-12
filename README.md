@@ -196,10 +196,9 @@ Remember to backup your raw data, metadata, scripts and conda environment(s), an
 
 Many researchers rely on the curated PR2 database for taxonomic identification of microeukaryotes/protists. If you want to use MetaBarFlow in connection with the PR2 reference database and the RDP Naive Bayesian Classifier algorithm described in Wang et al (2007), you may use the "workflow_PR2.py" and "taxonomy_PR2_v0.1.r" files instead of "workflow.py" and "taxonomy_V0.1.r". Remember to rename the "workflow_PR2.py" file to "workflow.py", to enable gwf to recognize the default workflow file. The taxonomy-script has a bootstrap support requirement for taxonomic identification, set to 80 by default, but this can be changed by adjusting the "minBoot = 80" in the script (**L61**). You will also need to download the reference database:
 
-```
-   wget https://github.com/pr2database/pr2database/releases/download/v5.0.0/pr2_version_5.0.0_SSU_dada2.fasta.gz
-```
-Finally, you'll have to adjust the path to wherever you've placed your reference library inside the taxonomy-script (**L60**).
+`wget https://github.com/pr2database/pr2database/releases/download/v5.0.0/pr2_version_5.0.0_SSU_dada2.fasta.gz`
+
+Finally, you'll have to adjust the path to wherever you've placed your reference library inside the taxonomy-script (refFasta = "/YOUR_PATH/pr2_version_5.0.0_SSU_dada2.fasta.gz", **L60**).
 
 ## Key Contributors
 
